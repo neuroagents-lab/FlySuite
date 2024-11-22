@@ -23,3 +23,10 @@ build-backend = "hatchling.build"
 dev-dependencies = [
     "ruff>=0.8.0",
 ]
+
+[tool.ruff.lint]
+ignore = ["E402"]
+extend-select = ["I"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
