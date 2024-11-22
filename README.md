@@ -1,4 +1,4 @@
-# flybody_envs
+# FlySuite
 This repository contains the environments and models of the flybody.
 
 The environments follow the [dm_env](https://github.com/google-deepmind/dm_env/tree/master) API spec.
