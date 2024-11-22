@@ -1,13 +1,13 @@
 """Walking imitation task for fruit fly."""
-# ruff: noqa: F821
 
 from typing import Sequence
 
 import numpy as np
+from dm_control import mjcf
 
-from flysuite.tasks.quaternions import rotate_vec_with_quat
 from flysuite.tasks.base import Walking
 from flysuite.tasks.constants import _TERMINAL_ANGVEL, _TERMINAL_LINVEL
+from flysuite.tasks.quaternions import rotate_vec_with_quat
 from flysuite.tasks.rewards import (
     get_reference_features,
     get_walker_features,

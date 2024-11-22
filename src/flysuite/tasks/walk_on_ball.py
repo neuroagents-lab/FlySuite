@@ -1,10 +1,9 @@
 """Task of tethered fly walking on floating ball."""
-# ruff: noqa: F821
 
 from typing import Optional
 
 import numpy as np
-from dm_control import composer
+from dm_control import composer, mjcf
 from dm_control.composer.observation import observable
 from dm_control.utils import rewards
 

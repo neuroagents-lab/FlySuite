@@ -3,12 +3,14 @@
 from typing import Any, Callable, Sequence
 
 import numpy as np
+from dm_control import mjcf
+from dm_env import specs
 
 from flysuite.tasks.quaternions import rotate_vec_with_quat
 
 
 def get_random_policy(
-    action_spec: "dm_env.specs.BoundedArray",
+    action_spec: "specs.BoundedArray",
     minimum: float = -0.2,
     maximum: float = 0.2,
 ) -> Callable[[Any], np.ndarray]:
@@ -22,7 +24,7 @@ def get_random_policy(
 
 
 def real2canonical(
-    action: np.ndarray, action_spec: "acme.types.NestedSpec", clip: bool = True
+    action: np.ndarray, action_spec: "specs.NestedSpec", clip: bool = True
 ) -> np.ndarray:
     """Transform action of real (not wrapped) environment to canonical
     representation in range [-1, 1].
@@ -50,7 +52,7 @@ def real2canonical(
 
 
 def canonical2real(
-    action: np.ndarray, action_spec: "acme.types.NestedSpec", clip: bool = True
+    action: np.ndarray, action_spec: "specs.NestedSpec", clip: bool = True
 ) -> np.ndarray:
     """Transform action in canonical representation in range [-1, 1] to
     action in real (not wrapped) environment.

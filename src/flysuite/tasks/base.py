@@ -6,8 +6,8 @@ from typing import Callable, Sequence, Union
 import numpy as np
 from dm_control import composer, mjcf
 from dm_control.composer.observation import observable
+from dm_control.locomotion.walkers import base
 
-from flysuite.tasks.quaternions import get_dquat_local
 from flysuite.tasks.constants import (
     _BODY_PITCH_ANGLE,
     _FLY_CONTROL_TIMESTEP,
@@ -17,6 +17,7 @@ from flysuite.tasks.constants import (
     _WALK_PHYSICS_TIMESTEP,
     _WING_PARAMS,
 )
+from flysuite.tasks.quaternions import get_dquat_local
 from flysuite.tasks.task_utils import make_ghost_fly
 
 

@@ -1,12 +1,13 @@
 """Flight imitation task."""
 
 import numpy as np
+from dm_control import mjcf
 from dm_control.utils import rewards
 
-from flysuite.tasks.quaternions import quat_dist_short_arc
 from flysuite.tasks.base import Flying
 from flysuite.tasks.constants import _TERMINAL_HEIGHT
 from flysuite.tasks.pattern_generators import WingBeatPatternGenerator
+from flysuite.tasks.quaternions import quat_dist_short_arc
 from flysuite.tasks.task_utils import (
     add_trajectory_sites,
     com2root,

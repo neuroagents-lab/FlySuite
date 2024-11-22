@@ -3,7 +3,7 @@
 from typing import Callable
 
 import numpy as np
-from dm_control import mujoco
+from dm_control import mjcf, mujoco
 
 from flysuite.tasks.base import Walking
 
