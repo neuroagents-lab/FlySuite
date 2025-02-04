@@ -31,7 +31,8 @@ def flight_imitation(ref_path: str,
                      joint_filter: float = 0.,
                      future_steps: int = 5,
                      random_state: np.random.RandomState | None = None,
-                     terminal_com_dist: float = 2.0):
+                     terminal_com_dist: float = 2.0,
+                     recompile_mjcf_every_episode: bool = False):
     """Requires a fruitfly to track a flying reference.
   
     Args:
@@ -60,7 +61,7 @@ def flight_imitation(ref_path: str,
         Environment for flight tracking task.
     """
     # Build a fruitfly walker and arena.
-    walker = fruitfly.FruitFly
+    walker = FruitFly
     arena = floors.Floor()
     # Initialize wing pattern generator and flight trajectory loader.
     wbpg = WingBeatPatternGenerator(base_pattern_path=wpg_pattern_path)
@@ -86,7 +87,8 @@ def flight_imitation(ref_path: str,
     return composer.Environment(time_limit=time_limit,
                                 task=task,
                                 random_state=random_state,
-                                strip_singleton_obs_buffer_dim=True)
+                                strip_singleton_obs_buffer_dim=True,
+                                recompile_mjcf_every_episode=recompile_mjcf_every_episode)
 
 
 def walk_imitation(ref_path: str | None = None,
@@ -95,7 +97,8 @@ def walk_imitation(ref_path: str | None = None,
                    traj_indices: Sequence[int] | None = None,
                    random_state: np.random.RandomState | None = None,
                    terminal_com_dist: float = 0.3,
-                   joint_filter: float = 0.01):
+                   joint_filter: float = 0.01,
+                   recompile_mjcf_every_episode: bool = False):
     """Requires a fruitfly to track a reference walking fly.
 
     Args:
@@ -116,7 +119,7 @@ def walk_imitation(ref_path: str | None = None,
         Environment for walking tracking task.
     """
     # Build a fruitfly walker and arena.
-    walker = fruitfly.FruitFly
+    walker = FruitFly
     arena = floors.Floor()
     # Initialize a walking trajectory loader.
     if ref_path is not None:
@@ -144,12 +147,14 @@ def walk_imitation(ref_path: str | None = None,
     return composer.Environment(time_limit=time_limit,
                                 task=task,
                                 random_state=random_state,
-                                strip_singleton_obs_buffer_dim=True)
+                                strip_singleton_obs_buffer_dim=True,
+                                recompile_mjcf_every_episode=recompile_mjcf_every_episode)
 
 
 def walk_on_ball(force_actuators: bool = False,
                  disable_wings: bool = True,
-                 random_state: np.random.RandomState | None = None):
+                 random_state: np.random.RandomState | None = None,
+                 recompile_mjcf_every_episode: bool = False):
     """Requires a tethered fruitfly to walk on a floating ball.
 
     Args:
@@ -162,7 +167,7 @@ def walk_on_ball(force_actuators: bool = False,
         Environment for fly walking on ball.
     """
     # Build a fruitfly walker and arena.
-    walker = fruitfly.FruitFly
+    walker = FruitFly
     arena = BallFloor(ball_pos=(-0.05, 0, -0.419),
                       ball_radius=0.454,
                       ball_density=0.0025,
@@ -180,7 +185,8 @@ def walk_on_ball(force_actuators: bool = False,
     return composer.Environment(time_limit=time_limit,
                                 task=task,
                                 random_state=random_state,
-                                strip_singleton_obs_buffer_dim=True)
+                                strip_singleton_obs_buffer_dim=True,
+                                recompile_mjcf_every_episode=recompile_mjcf_every_episode)
 
 
 def vision_guided_flight(wpg_pattern_path: str | None = None,
@@ -189,6 +195,7 @@ def vision_guided_flight(wpg_pattern_path: str | None = None,
                          disable_legs: bool = True,
                          random_state: np.random.RandomState | None = None,
                          joint_filter: float = 0.,
+                         recompile_mjcf_every_episode: bool = True,
                          **kwargs_arena):
     """Vision-guided flight tasks: 'bumps' and 'trench'.
 
@@ -216,7 +223,7 @@ def vision_guided_flight(wpg_pattern_path: str | None = None,
     else:
         raise ValueError("Only 'bumps' and 'trench' terrains are supported.")
     # Build fruitfly walker and arena.
-    walker = fruitfly.FruitFly
+    walker = FruitFly
     arena = arena(**kwargs_arena)
     # Initialize a wing beat pattern generator.
     wbpg = WingBeatPatternGenerator(base_pattern_path=wpg_pattern_path)
@@ -235,7 +242,8 @@ def vision_guided_flight(wpg_pattern_path: str | None = None,
     return composer.Environment(time_limit=time_limit,
                                 task=task,
                                 random_state=random_state,
-                                strip_singleton_obs_buffer_dim=True)
+                                strip_singleton_obs_buffer_dim=True,
+                                recompile_mjcf_every_episode=recompile_mjcf_every_episode)
 
 
 def template_task(random_state: np.random.RandomState | None = None,
@@ -246,7 +254,8 @@ def template_task(random_state: np.random.RandomState | None = None,
                   time_limit: float = 1.,
                   mjcb_control: Callable | None = None,
                   observables_options: dict | None = None,
-                  action_corruptor: Callable | None = None):
+                  action_corruptor: Callable | None = None,
+                  recompile_mjcf_every_episode: bool = False):
     """An empty no-op walking task for testing.
 
     Args:
@@ -271,7 +280,7 @@ def template_task(random_state: np.random.RandomState | None = None,
         Template walking environment.
     """
     # Build a fruitfly walker and arena.
-    walker = fruitfly.FruitFly
+    walker = FruitFly
     arena = floors.Floor()
     # Build a no-op task.
     task = TemplateTask(walker=walker,
@@ -289,4 +298,5 @@ def template_task(random_state: np.random.RandomState | None = None,
     return composer.Environment(time_limit=time_limit,
                                 task=task,
                                 random_state=random_state,
-                                strip_singleton_obs_buffer_dim=True)
+                                strip_singleton_obs_buffer_dim=True,
+                                recompile_mjcf_every_episode=recompile_mjcf_every_episode)

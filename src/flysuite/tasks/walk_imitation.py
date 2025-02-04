@@ -97,6 +97,11 @@ class WalkImitation(Walking):
     def initialize_episode_mjcf(self, random_state: np.random.RandomState):
         super().initialize_episode_mjcf(random_state)
 
+    def initialize_episode(self, physics: 'mjcf.Physics',
+                           random_state: np.random.RandomState):
+        """Randomly selects a starting point and set the walker."""
+        super().initialize_episode(physics, random_state)
+
         # Pick walking snippet (get snippet dict).
         self._snippet = self._traj_generator.get_trajectory(
             traj_idx=self._next_traj_idx)
@@ -113,11 +118,6 @@ class WalkImitation(Walking):
         if self._trajectory_sites:
             update_trajectory_sites(self.root_entity, self._ref_qpos,
                                     self._n_traj_sites, self._episode_steps)
-
-    def initialize_episode(self, physics: 'mjcf.Physics',
-                           random_state: np.random.RandomState):
-        """Randomly selects a starting point and set the walker."""
-        super().initialize_episode(physics, random_state)
 
         # Set full initial qpos
         physics.bind(self._mocap_joints).qpos = self._ref_qpos[0, :]

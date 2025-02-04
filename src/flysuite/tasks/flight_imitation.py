@@ -86,6 +86,15 @@ class FlightImitationWBPG(Flying):
     def initialize_episode_mjcf(self, random_state: np.random.RandomState):
         super().initialize_episode_mjcf(random_state)
 
+    def initialize_episode(self, physics: 'mjcf.Physics',
+                           random_state: np.random.RandomState):
+        """Randomly select a starting point and set the walker.
+
+        Environment call sequence:
+            check_termination, get_reward_factors, get_discount
+        """
+        super().initialize_episode(physics, random_state)
+        
         # Get next trajectory.
         self._ref_qpos, self._ref_qvel = self._traj_generator.get_trajectory(
             traj_idx=self._next_traj_idx)
@@ -115,15 +124,7 @@ class FlightImitationWBPG(Flying):
         self._crosshair_sites[1].fromto[[2, 5]] = z
         self._crosshair_sites[2].fromto[[2, 5]] = z
 
-    def initialize_episode(self, physics: 'mjcf.Physics',
-                           random_state: np.random.RandomState):
-        """Randomly select a starting point and set the walker.
-
-        Environment call sequence:
-            check_termination, get_reward_factors, get_discount
-        """
-        super().initialize_episode(physics, random_state)
-
+        # Set ghost position
         ghost_qpos = self._ref_qpos[0, :] + np.hstack(
             (self._ghost_offset, 4 * [0]))
         self._ghost.set_pose(physics, ghost_qpos[:3], ghost_qpos[3:])
