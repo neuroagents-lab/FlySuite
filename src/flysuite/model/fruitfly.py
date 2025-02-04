@@ -125,8 +125,10 @@ class FruitFly(legacy_base.Walker):
         use_wings: bool = False,
         use_mouth: bool = False,
         use_antennae: bool = False,
+        force_actuators: bool = False,
         joint_filter: float = 0.01,
         adhesion_filter: float = 0.007,
+        dyntype_filterexact: bool = False,
         body_pitch_angle: float = 47.5,
         stroke_plane_angle: float = 0.,
         physics_timestep: float = 1e-4,
@@ -143,8 +145,13 @@ class FruitFly(legacy_base.Walker):
             use_wings: Whether to use or retract the wings.
             use_mouth: Whether to use or retract the mouth.
             use_antennae: Whether to use the antennae.
+            force_actuators: Whether to use force or position actuators for body
+                and legs. Wings always use force actuators.
             joint_filter: Timescale of filter for joint actuators. 0: disabled.
             adhesion_filter: Timescale of filter for adhesion actuators. 0: disabled.
+            dyntype_filterexact: When joint or adhesion filters are enabled, whether
+                to use exact-integration activation dyntype `filterexact`.
+                If False, use approximate `filter` dyntype.
             body_pitch_angle: Body pitch angle for initial flight pose, relative to
                 ground, degrees. 0: horizontal body position. Default value from
                 https://doi.org/10.1126/science.1248955
@@ -292,16 +299,38 @@ class FruitFly(legacy_base.Walker):
                 body = root.find('body', wing)
                 change_body_frame(body, body.pos, new_wing_quat)
 
+        # === Maybe switch to force actuators.
+        if force_actuators:
+            # Update all `general` defaults, keep gainprm unchanged.
+            for default in root.find_all('default'):
+                for child in default.all_children():
+                    if child.tag != 'general':
+                        continue
+                    child.biastype = None
+                    child.biasprm = None
+                    child.ctrlrange = None
+            # Set single top-level default ctrlrange.
+            root.default.general.ctrlrange = (-1, 1)
+            # Also update `general` actuator parameters directly, if any.
+            for actuator in root.find_all('actuator'):
+                if actuator.tag == 'adhesion':
+                    continue
+                assert actuator.tag == 'general'
+                actuator.ctrlrange = None
+                actuator.biastype = None
+                actuator.biasprm = None
+
         # === Maybe change actuator dynamics to `filter`.
+        dyntype = 'filterexact' if dyntype_filterexact else 'filter'
         if joint_filter > 0:
             for actuator in root.find_all('actuator'):
                 if actuator.tag != 'adhesion':
-                    actuator.dyntype = 'filter'
+                    actuator.dyntype = dyntype
                     actuator.dynprm = (joint_filter, )
         if adhesion_filter > 0:
             for actuator in root.find_all('actuator'):
                 if actuator.tag == 'adhesion':
-                    actuator.dclass.parent.general.dyntype = 'filter'
+                    actuator.dclass.parent.general.dyntype = dyntype
                     actuator.dclass.parent.general.dynprm = (adhesion_filter, )
 
         # === Get action-class indices into the MuJoCo control vector.
@@ -366,6 +395,8 @@ class FruitFly(legacy_base.Walker):
                     j = f'walker/wing_{dof}_{s}'
                     physics.named.data.qpos[
                         j] = physics.named.model.qpos_spring[j]
+        # Set previous action to zero.
+        self._prev_action = np.zeros_like(self._prev_action)
 
     # -------------------------------------------------------------------------
 
